@@ -6,38 +6,34 @@ function main() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 	window.addEventListener("resize", onWindowResize, false);
+	const particles = [];
 
-	for (let i = 1; i < 11; i++) {
-		const curve = new THREE.EllipseCurve(
-			0,
-			0, // ax, aY
-			15 * i,
-			20 * i, // xRadius, yRadius
-			0,
-			2 * Math.PI, // aStartAngle, aEndAngle
-			false, // aClockwise
-			2 * Math.PI - i * 3.4 // aRotation
-		);
-		const points = curve.getPoints(50);
-		const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-		const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-		// Create the final object to add to the scene
-		const ellipse = new THREE.Line(geometry, material);
-
-		scene.add(ellipse);
+	for (let i = 0; i < 3000; i++) {
+		let radius = getRandomVal(0, 300);
+		let angle = getRandomVal(0, 360);
+		let ellipseOffset = 300 / radius;
+		let particle = new Particle(radius, radius / 1.2, angle, ellipseOffset);
+		particles.push(particle);
+		scene.add(particle);
 	}
 
-	camera.position.z = 300;
+	let boundary = new THREE.Box3(new THREE.Vector3(-300, -300, 0), new THREE.Vector3(300, 300, 0));
+	let helper = new THREE.Box3Helper(boundary);
+	scene.add(helper);
+
+	camera.position.z = 400;
 
 	renderer.render(scene, camera);
 
-	// function animate() {
-	// 	requestAnimationFrame(animate);
-	// 	renderer.render(scene, camera);
-	// }
-	// animate();
+	function animate() {
+		requestAnimationFrame(animate);
+		for (let particle of particles) {
+			particle.update();
+		}
+
+		renderer.render(scene, camera);
+	}
+	animate();
 
 	function onWindowResize() {
 		camera.aspect = window.innerWidth / window.innerHeight;
@@ -52,4 +48,16 @@ main();
 
 function getRandomVal(min, max) {
 	return Math.random() * (max - min + 1) + min;
+}
+
+function intensityBulge(r, i, k) {
+	return i * Math.exp(-k * Math.pow(r, 0.25));
+}
+
+function intensityDisc(r, i, a) {
+	return i * Math.exp(-r / a);
+}
+
+function intensity(x, bulge, i, k, a) {
+	return x < bulge ? intensityBulge(x, i, k) : intensityDisc(x - bulge, intensityBulge(bulge, i, k), a);
 }
