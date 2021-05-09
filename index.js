@@ -6,6 +6,8 @@ function main() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 	window.addEventListener("resize", onWindowResize, false);
+	guiSetup();
+
 	const particles = [];
 
 	for (let i = 0; i < 3000; i++) {
@@ -16,10 +18,6 @@ function main() {
 		particles.push(particle);
 		scene.add(particle);
 	}
-
-	let boundary = new THREE.Box3(new THREE.Vector3(-300, -300, 0), new THREE.Vector3(300, 300, 0));
-	let helper = new THREE.Box3Helper(boundary);
-	scene.add(helper);
 
 	camera.position.z = 400;
 
