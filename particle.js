@@ -1,6 +1,6 @@
 class Particle extends THREE.Mesh {
 	constructor(radius, b, angle, ellipseOffset) {
-		const geometry = new THREE.SphereGeometry(1, 32, 32);
+		const geometry = new THREE.SphereGeometry(1, 1, 1);
 		const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
 		super(geometry, material);
 		this.ellipseOffset = ellipseOffset;

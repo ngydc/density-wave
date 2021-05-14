@@ -11,7 +11,8 @@ function main() {
 	const particles = [];
 
 	for (let i = 0; i < 3000; i++) {
-		let radius = getRandomVal(0, 300);
+		// arbitrary function modelling the distribution of stars (more stars to the core)
+		let radius = Math.abs(1000 * Math.pow(Math.random() - 0.5, 2));
 		let angle = getRandomVal(0, 360);
 		let ellipseOffset = 300 / radius;
 		let particle = new Particle(radius, radius / 1.2, angle, ellipseOffset);
