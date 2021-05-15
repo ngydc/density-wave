@@ -1,3 +1,7 @@
+import * as THREE from "../lib/three.module.js";
+import Particle from "./particle.js";
+import * as Controls from "./controls.js";
+
 function main() {
 	const scene = new THREE.Scene();
 	const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -6,7 +10,7 @@ function main() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 	window.addEventListener("resize", onWindowResize, false);
-	guiSetup();
+	Controls.guiSetup();
 
 	const particles = [];
 
@@ -47,16 +51,4 @@ main();
 
 function getRandomVal(min, max) {
 	return Math.random() * (max - min + 1) + min;
-}
-
-function intensityBulge(r, i, k) {
-	return i * Math.exp(-k * Math.pow(r, 0.25));
-}
-
-function intensityDisc(r, i, a) {
-	return i * Math.exp(-r / a);
-}
-
-function intensity(x, bulge, i, k, a) {
-	return x < bulge ? intensityBulge(x, i, k) : intensityDisc(x - bulge, intensityBulge(bulge, i, k), a);
 }
