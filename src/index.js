@@ -1,6 +1,7 @@
 import * as THREE from "../lib/three.module.js";
-import Particle from "./particle.js";
-import * as Controls from "./controls.js";
+import Galaxy from "./galaxy.js";
+import ControlsUI from "./controls.js";
+import Stats from "../lib/stats.module.js";
 
 function main() {
 	const scene = new THREE.Scene();
@@ -10,31 +11,22 @@ function main() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 	window.addEventListener("resize", onWindowResize, false);
-	Controls.guiSetup();
-
-	const particles = [];
-
-	for (let i = 0; i < 3000; i++) {
-		// arbitrary function modelling the distribution of stars (more stars to the core)
-		let radius = Math.abs(1000 * Math.pow(Math.random() - 0.5, 2));
-		let angle = getRandomVal(0, 360);
-		let ellipseOffset = 300 / radius;
-		let particle = new Particle(radius, radius / 1.2, angle, ellipseOffset);
-		particles.push(particle);
-		scene.add(particle);
-	}
 
 	camera.position.z = 400;
 
+	const galaxy = new Galaxy(20000, 200, 50, 0);
+	const gui = new ControlsUI(galaxy);
+	scene.add(galaxy);
 	renderer.render(scene, camera);
+
+	const stats = new Stats();
+	document.body.appendChild(stats.dom);
 
 	function animate() {
 		requestAnimationFrame(animate);
-		for (let particle of particles) {
-			particle.update();
-		}
-
+		galaxy.updateStars();
 		renderer.render(scene, camera);
+		stats.update();
 	}
 	animate();
 
@@ -48,7 +40,3 @@ function main() {
 }
 
 main();
-
-function getRandomVal(min, max) {
-	return Math.random() * (max - min + 1) + min;
-}

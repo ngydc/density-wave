@@ -1,12 +1,10 @@
-import * as dat from "../lib/dat.gui.module.js";
+import { GUI } from "../lib/dat.gui.module.js";
 
-export const data = new (function () {
-	this.animationSpeed = 0.01;
-	this.ellipseOffset = 600;
-})();
-
-export function guiSetup() {
-	let gui = new dat.GUI();
-	gui.add(data, "animationSpeed", 0, 0.1);
-	gui.add(data, "ellipseOffset", 0, 2000);
+export default class ControlsUI {
+	constructor(galaxy) {
+		const gui = new GUI({ width: 350 });
+		gui.add(galaxy.geometry, "instanceCount", 0, galaxy.starCount).name("Amount of Stars");
+		gui.add(galaxy.material.uniforms["ellipseOffset"], "value", 0, 1000).name("Ellipse Offset");
+		gui.add(galaxy.material.uniforms["axisRatio"], "value", 0, 1).name("Axis Ratio Ellipse");
+	}
 }
