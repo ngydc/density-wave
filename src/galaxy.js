@@ -1,9 +1,11 @@
 import * as THREE from "../lib/three.module.js";
 
 const fShader = `
+precision highp float;
+varying float col;
 
 void main() {
-	gl_FragColor = vec4(1.);
+	gl_FragColor = vec4(col);
 }
 `;
 
@@ -18,6 +20,22 @@ uniform float ellipseOffset;
 
 attribute vec3 position;
 attribute vec3 trajectoryData;
+
+varying float col;
+
+float intensityBulge(float r, float i, float k) {
+	return i * exp(-k * pow(r, 0.25));
+}
+
+float intensityDisc(float r, float i, float a) {
+	return i * exp(-r / a);
+}
+
+float intensity(float x, float bulge, float i, float k, float a) {
+	return x < bulge ? intensityBulge(x, i, k) : intensityDisc(x - bulge, intensityBulge(bulge, i, k), a);
+}
+
+
 
 vec3 calcEllipsePos() {
 	float angle = trajectoryData.y + time;
@@ -41,7 +59,10 @@ void main() {
 	vec3 newPos = calcEllipsePos();
 	vec4 mvPosition = modelViewMatrix * vec4( newPos, 1.0 );
 	mvPosition.xyz += position ;
+	float d = sqrt(newPos.x*newPos.x + newPos.y*newPos.y);
+	col = intensity(d, 50., 1.0, 0.05, 300. / 3.);
 	gl_Position = projectionMatrix * mvPosition;
+
 
 }
 `;
@@ -50,7 +71,7 @@ export default class Galaxy extends THREE.Mesh {
 	constructor(starCount, radius, coreRadius, ellipseOffset) {
 		super();
 
-		const sphereGeometry = new THREE.SphereGeometry(1);
+		const sphereGeometry = new THREE.SphereGeometry(0.5);
 		const attrTrajectory = new Float32Array(starCount * 3);
 
 		// fill necessary components of trajectory into the array
