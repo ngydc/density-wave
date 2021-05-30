@@ -2,6 +2,7 @@ import * as THREE from "../lib/three.module.js";
 import Galaxy from "./galaxy.js";
 import ControlsUI from "./controls.js";
 import Stats from "../lib/stats.module.js";
+import { OrbitControls } from "../lib/OrbitControls.js";
 
 function main() {
 	const scene = new THREE.Scene();
@@ -13,6 +14,11 @@ function main() {
 	window.addEventListener("resize", onWindowResize, false);
 
 	camera.position.z = 400;
+	const orbitControls = new OrbitControls(camera, renderer.domElement);
+	orbitControls.enableDamping = false;
+	orbitControls.enableZoom = true;
+	orbitControls.enableRotate = false;
+	orbitControls.enablePan = false;
 
 	const galaxy = new Galaxy(20000, 200, 50, 0);
 	const gui = new ControlsUI(galaxy);

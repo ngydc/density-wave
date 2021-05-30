@@ -14,15 +14,17 @@ const vShader = `
 precision highp float;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+
 uniform float time;
 uniform float axisRatio;
 uniform float ellipseOffset;
 
 attribute vec3 position;
-attribute vec3 trajectoryData;
+attribute vec2 trajectoryData;
 
 varying float col;
 
+// color calculations
 float intensityBulge(float r, float i, float k) {
 	return i * exp(-k * pow(r, 0.25));
 }
@@ -34,8 +36,6 @@ float intensityDisc(float r, float i, float a) {
 float intensity(float x, float bulge, float i, float k, float a) {
 	return x < bulge ? intensityBulge(x, i, k) : intensityDisc(x - bulge, intensityBulge(bulge, i, k), a);
 }
-
-
 
 vec3 calcEllipsePos() {
 	float angle = trajectoryData.y + time;
@@ -53,8 +53,6 @@ vec3 calcEllipsePos() {
 	return vec3(x,y,0.);
 }
 
-
-
 void main() {
 	vec3 newPos = calcEllipsePos();
 	vec4 mvPosition = modelViewMatrix * vec4( newPos, 1.0 );
@@ -62,12 +60,11 @@ void main() {
 	float d = sqrt(newPos.x*newPos.x + newPos.y*newPos.y);
 	col = intensity(d, 50., 1.0, 0.05, 300. / 3.);
 	gl_Position = projectionMatrix * mvPosition;
-
-
 }
 `;
 
 export default class Galaxy extends THREE.Mesh {
+	//TODO: include radius, coreRadius and ellipseOffset
 	constructor(starCount, radius, coreRadius, ellipseOffset) {
 		super();
 
@@ -103,10 +100,11 @@ export default class Galaxy extends THREE.Mesh {
 		this.geometry = geometry;
 		this.material = material;
 		this.starCount = starCount;
+		this.animationSpeed = 1;
 	}
 
 	updateStars() {
-		this.material.uniforms["time"].value += 0.01;
+		this.material.uniforms["time"].value += 0.01 * this.animationSpeed;
 	}
 }
 
